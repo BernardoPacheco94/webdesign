@@ -16,15 +16,15 @@
         <p><button id="btnStart">COMEÇAR A GRAVAR</button><br/>
         <button id="btnStop">PARAR GRAVAÇÃO</button></p>
         
-        <video controls></video>
+        <video controls></video> <!-- Esse mostra o que está sendo passado na webcam-->
         
-        <video id="vid2" controls></video>
+        <video id="vid2" controls></video> <!--Esse recebe o conteúdo capturado -->
         
         <!-- could save to canvas and do image manipulation and saving too -->
     </main>    
     <script>
         
-        let constraintObj = { 
+        let constraintObj = { //Objeto, video
             audio: false, 
             video: { 
                 facingMode: "user", 
@@ -61,10 +61,10 @@
             })
         }
 
-        navigator.mediaDevices.getUserMedia(constraintObj)
+        navigator.mediaDevices.getUserMedia(constraintObj) // getUserMedia - metodo que acessa a camera, passa o construtor e retorna uma promess
         .then(function(mediaStreamObj) {
             //connect the media stream to the first video element
-            let video = document.querySelector('video');
+            let video = document.querySelector('video');//primeiro player em execução
             if ("srcObject" in video) {
                 video.srcObject = mediaStreamObj;
             } else {
@@ -81,8 +81,8 @@
             let start = document.getElementById('btnStart');
             let stop = document.getElementById('btnStop');
             let vidSave = document.getElementById('vid2');
-            let mediaRecorder = new MediaRecorder(mediaStreamObj);
-            let chunks = [];
+            let mediaRecorder = new MediaRecorder(mediaStreamObj);//Declara o obj Gravação de midia
+            let chunks = [];//array que vai receber os videos, convertido em blob
             
             start.addEventListener('click', (ev)=>{
                 mediaRecorder.start();
@@ -92,14 +92,15 @@
                 mediaRecorder.stop();
                 console.log(mediaRecorder.state);
             });
-            mediaRecorder.ondataavailable = function(ev) {
+            mediaRecorder.ondataavailable = function(ev) {//quando o evento está disponível entra no array chunks
                 chunks.push(ev.data);
             }
-            mediaRecorder.onstop = (ev)=>{
+            mediaRecorder.onstop = (ev)=>{//Quando a gravação para converte o chunks para blob, informando o formato e recebendo de volta o array convertido
                 let blob = new Blob(chunks, { 'type' : 'video/mp4;' });
                 chunks = [];
-                let videoURL = window.URL.createObjectURL(blob);
-                vidSave.src = videoURL;
+                let videoURL = window.URL.createObjectURL(blob);//converte o blob em url
+                vidSave.src = videoURL;//disponibiliza download
+                
             }
         })
         .catch(function(err) { 
@@ -109,7 +110,7 @@
         /*********************************
         getUserMedia returns a Promise
         resolve - returns a MediaStream Object
-        reject returns one of the following errors
+        reject retorna algum dos erros abaixo
         AbortError - generic unknown cause
         NotAllowedError (SecurityError) - user rejected permissions
         NotFoundError - missing media track
